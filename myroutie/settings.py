@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'users',
     'corsheaders',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -55,8 +56,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL= True
+CORS_ORIGIN_ALLOW_ALL= False
 CORS_ALLOW_CREDENTIALS=True
+CORS_ALLOWED_ORIGINS = [  # 허용할 도메인 명시
+    "http://localhost:3000",  # React 개발 서버
+    #"https://your-production-domain.com",  # 배포된 프론트엔드 도메인
+    "exp://192.168.45.152:8081",
+    "http://localhost:8081",
+]
 
 ROOT_URLCONF = 'myroutie.urls'
 
