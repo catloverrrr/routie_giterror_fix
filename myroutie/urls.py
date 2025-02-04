@@ -23,6 +23,12 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from django.http import JsonResponse
+
+# 루트 페이지 응답 (테스트용)
+def home(request):
+    return JsonResponse({"message": "Routie API Server is Running!"})
+
 schema_view=get_schema_view(
     openapi.Info(
         title="API Docs",
@@ -33,6 +39,7 @@ schema_view=get_schema_view(
 )
 
 urlpatterns = [
+    path("", home),
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema.swagger-ui'),

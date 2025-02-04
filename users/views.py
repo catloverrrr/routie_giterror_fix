@@ -11,11 +11,13 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
-    
+
     def get(self, request, *args, **kwargs):
         return Response(
-            {"message": "GET method is not supported for registration."},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            {
+                "message": "이 API는 회원가입 기능을 제공합니다. 회원가입을 하려면 username, password, email 등을 포함하여 POST 요청을 보내세요."
+            },
+            status=status.HTTP_200_OK,  # 405 대신 200으로 정상 응답
         )
 
     def post(self, request, *args, **kwargs):
@@ -38,7 +40,6 @@ class RegisterView(generics.CreateAPIView):
                 status=status.HTTP_201_CREATED,
             )
         except IntegrityError as e:
-            # Handle unique constraint failures
             if "users_profile.phonenumber" in str(e):
                 return Response(
                     {"error": "The phone number is already registered."},
@@ -50,11 +51,13 @@ class RegisterView(generics.CreateAPIView):
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = [AllowAny]
-    
+
     def get(self, request):
         return Response(
-            {"message": "Send POST request with username and password to log in."},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            {
+                "message": "이 API는 로그인 기능을 제공합니다. 로그인을 하려면 username과 password를 포함하여 POST 요청을 보내세요."
+            },
+            status=status.HTTP_200_OK,  # 405가 아니라 200을 반환하여 정상 응답 처리
         )
 
     def post(self, request):
@@ -63,7 +66,6 @@ class LoginView(generics.GenericAPIView):
         token = serializer.validated_data  # Ensure token is a Token object
 
         return Response(
-            #{"token": token.key},
             token,
             status=status.HTTP_200_OK,
         )
@@ -75,5 +77,6 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # 요청한 사용자에 대한 프로필만 반환
+        if not self.request.user.is_authenticated:
+            return Profile.objects.none()  # 인증되지 않은 사용자일 경우 빈 QuerySet 반환
         return Profile.objects.filter(user=self.request.user)
